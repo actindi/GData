@@ -34,18 +34,19 @@ module GData
       end
       
       # Implement read so that this class can be treated as a stream.
-      def read(bytes_requested)
+      def read(bytes_requested, buffer='')
+        buffer.clear
         if @current_part >= @parts.length
           return false
         end
         
-        buffer = @parts[@current_part].read(bytes_requested)
+        buffer << @parts[@current_part].read(bytes_requested)
         
         until buffer.length == bytes_requested
           @current_part += 1
           next_buffer = self.read(bytes_requested - buffer.length)
           break if not next_buffer
-          buffer += next_buffer
+          buffer << next_buffer
         end
         
         return buffer
